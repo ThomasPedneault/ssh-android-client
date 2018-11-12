@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.example.thomaspedneault.ssh_client.R;
 import com.example.thomaspedneault.ssh_client.model.ServerInfo;
 import com.example.thomaspedneault.ssh_client.util.CircleView;
+import com.jcraft.jsch.JSch;
 
 import java.util.ArrayList;
 import java.util.List;
