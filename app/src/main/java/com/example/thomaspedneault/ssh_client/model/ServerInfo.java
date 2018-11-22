@@ -6,18 +6,22 @@ public class ServerInfo {
 
     private String ip;
     private String name;
-    private boolean state;
 
     public ServerInfo() {
-        this.ip = "DEFAULT IP";
-        this.name = "DEFAULT NAME";
-        this.state = true;
+        this("DEFAULT", "DEFAULT");
     }
 
-    public ServerInfo(String ip, String name, boolean state) {
+    public ServerInfo(String ip, String name) {
         this.ip = ip;
         this.name = name;
-        this.state = state;
+    }
+
+    @Override
+    public String toString() {
+        return "ServerInfo{" +
+                "ip='" + ip + '\'' +
+                ", name='" + name + '\'' +
+                '}';
     }
 
     @Override
@@ -25,14 +29,13 @@ public class ServerInfo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ServerInfo that = (ServerInfo) o;
-        return state == that.state &&
-                Objects.equals(ip, that.ip) &&
+        return Objects.equals(ip, that.ip) &&
                 Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ip, name, state);
+        return Objects.hash(ip, name);
     }
 
     public String getIp() {
@@ -49,14 +52,6 @@ public class ServerInfo {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public boolean isState() {
-        return state;
-    }
-
-    public void setState(boolean state) {
-        this.state = state;
     }
 
 }
