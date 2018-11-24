@@ -3,6 +3,7 @@ package com.example.thomaspedneault.ssh_client.ui;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.thomaspedneault.ssh_client.R;
+import com.example.thomaspedneault.ssh_client.model.Commands;
 import com.example.thomaspedneault.ssh_client.model.IOnAsyncTaskComplete;
 import com.example.thomaspedneault.ssh_client.model.IOnCommandCompleteEvent;
 import com.example.thomaspedneault.ssh_client.model.Identity;
@@ -68,6 +70,15 @@ public class ServerListFragment extends Fragment {
         private TextView serverIpTextView;
         private TextView serverNameTextView;
         private TextView serverExceptionTextView;
+
+        // Constraint layout containing all the UI elements for the server's output.
+        private ConstraintLayout serverOutputConstaintLayout;
+
+        // Load average UI elements.
+        private TextView loadAvg1minTextView;
+        private TextView loadAvg5minTextView;
+        private TextView loadAvg15minTextView;
+
         private final CircleView stateCircleView;
 
         private ServerConnection connection;
@@ -79,6 +90,13 @@ public class ServerListFragment extends Fragment {
             serverIpTextView = root.findViewById(R.id.serverIp_TextView);
             serverNameTextView = root.findViewById(R.id.serverName_TextView);
             serverExceptionTextView = root.findViewById(R.id.serverException_TextView);
+
+            serverOutputConstaintLayout = root.findViewById(R.id.serverOutput_ConstraintLayout);
+
+            loadAvg1minTextView = root.findViewById(R.id.loadAvg1min_TextView);
+            loadAvg5minTextView = root.findViewById(R.id.loadAvg5min_TextView);
+            loadAvg15minTextView = root.findViewById(R.id.loadAvg15min_TextView);
+
             stateCircleView = root.findViewById(R.id.state_CircleView);
 
             root.setOnClickListener(v -> Toast.makeText(getContext(), connection.getServer().getIp(), Toast.LENGTH_SHORT).show());
@@ -116,9 +134,13 @@ public class ServerListFragment extends Fragment {
             // Verify which state was returned.
             switch(connection.getState()) {
                 case Up:
-                    connection.asyncExecCommand("top -bn1 | head -n 5", output -> Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
-                        serverExceptionTextView.setVisibility(View.VISIBLE);
-                        serverExceptionTextView.setText(output);
+                    // Make the server output constraint layout visible.
+                    serverOutputConstaintLayout.setVisibility(View.VISIBLE);
+                    connection.asyncExecCommand(Commands.Bash.loadAverage, output -> Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
+                        String[] values = output.split(",");
+                        loadAvg1minTextView.setText(values[0]);
+                        loadAvg5minTextView.setText(values[1]);
+                        loadAvg15minTextView.setText(values[2]);
                     }));
                     break;
                 case Warn:
