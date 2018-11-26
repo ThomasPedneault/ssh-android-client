@@ -1,8 +1,11 @@
 package com.example.thomaspedneault.ssh_client.ui;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -34,10 +37,16 @@ public class ServerListFragment extends Fragment {
 
     private RecyclerView serversRecyclerView;
     private ServerAdapter serverAdapter;
+    private FloatingActionButton addServerFab;
 
     public ServerListFragment() {
         servers = new ArrayList<>();
         servers.addAll(SampleData.getServerConnections());
+    }
+
+    public void addServerConnection(ServerConnection connection) {
+        servers.add(connection);
+        serverAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -54,7 +63,28 @@ public class ServerListFragment extends Fragment {
         serverAdapter = new ServerAdapter(servers);
         serversRecyclerView.setAdapter(serverAdapter);
 
+        addServerFab = root.findViewById(R.id.addServer_Fab);
+        addServerFab.setOnClickListener(v -> {
+            Intent intent = new Intent(this.getActivity(), ServerAddActivity.class);
+            startActivityForResult(intent, ServerListActivity.NEW_SERVER_REQUEST);
+        });
+
         return root;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            case ServerListActivity.NEW_SERVER_REQUEST:
+                if(resultCode == Activity.RESULT_OK) {
+                    ServerConnection connection = data.getParcelableExtra("connection");
+                    addServerConnection(connection);
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     public class ServerViewHolder extends RecyclerView.ViewHolder {

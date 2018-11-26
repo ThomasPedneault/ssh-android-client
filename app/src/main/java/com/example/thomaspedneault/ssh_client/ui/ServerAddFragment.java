@@ -35,7 +35,7 @@ public class ServerAddFragment extends Fragment {
             EditText username = root.findViewById(R.id.username_EditText);
             EditText password = root.findViewById(R.id.password_EditText);
 
-            // return the serverconnection object.
+            // return the ServerConnection object.
             ServerInfo serverInfo = new ServerInfo(ipAddress.getText().toString(), nickname.getText().toString());
             Identity identity = new Identity(username.getText().toString(), password.getText().toString());
             ServerConnection conn = new ServerConnection(serverInfo, identity);
