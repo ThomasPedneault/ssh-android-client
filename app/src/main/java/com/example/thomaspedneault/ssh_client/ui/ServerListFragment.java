@@ -1,15 +1,12 @@
 package com.example.thomaspedneault.ssh_client.ui;
 
 import android.graphics.Rect;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,15 +14,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.thomaspedneault.ssh_client.R;
-import com.example.thomaspedneault.ssh_client.model.Commands;
 import com.example.thomaspedneault.ssh_client.model.IOnAsyncTaskComplete;
-import com.example.thomaspedneault.ssh_client.model.IOnCommandCompleteEvent;
-import com.example.thomaspedneault.ssh_client.model.Identity;
 import com.example.thomaspedneault.ssh_client.model.SampleData;
 import com.example.thomaspedneault.ssh_client.model.ServerConnection;
-import com.example.thomaspedneault.ssh_client.model.ServerInfo;
 import com.example.thomaspedneault.ssh_client.util.CircleView;
-import com.jcraft.jsch.JSch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +27,8 @@ import java.util.Objects;
  * A placeholder fragment containing a simple view.
  */
 public class ServerListFragment extends Fragment {
+
+    private static final int POLL_RATE = 5000;
 
     private List<ServerConnection> servers;
 
@@ -72,13 +66,14 @@ public class ServerListFragment extends Fragment {
         private TextView serverExceptionTextView;
 
         // Constraint layout containing all the UI elements for the server's output.
-        private ConstraintLayout serverOutputConstaintLayout;
+        private ConstraintLayout serverOutputConstraintLayout;
 
-        // Load average UI elements.
+        // Server statistics UI elements.
         private TextView loadAvg1minTextView;
         private TextView loadAvg5minTextView;
         private TextView loadAvg15minTextView;
-
+        private TextView filesystemTextView;
+        private TextView countUsersTextView;
         private final CircleView stateCircleView;
 
         private ServerConnection connection;
@@ -91,15 +86,21 @@ public class ServerListFragment extends Fragment {
             serverNameTextView = root.findViewById(R.id.serverName_TextView);
             serverExceptionTextView = root.findViewById(R.id.serverException_TextView);
 
-            serverOutputConstaintLayout = root.findViewById(R.id.serverOutput_ConstraintLayout);
+            serverOutputConstraintLayout = root.findViewById(R.id.serverOutput_ConstraintLayout);
 
+            // Server statistics
             loadAvg1minTextView = root.findViewById(R.id.loadAvg1min_TextView);
             loadAvg5minTextView = root.findViewById(R.id.loadAvg5min_TextView);
             loadAvg15minTextView = root.findViewById(R.id.loadAvg15min_TextView);
-
+            filesystemTextView = root.findViewById(R.id.filesystem_TextView);
+            countUsersTextView = root.findViewById(R.id.countUsers_TextView);
             stateCircleView = root.findViewById(R.id.state_CircleView);
 
             root.setOnClickListener(v -> Toast.makeText(getContext(), connection.getServer().getIp(), Toast.LENGTH_SHORT).show());
+        }
+
+        private String getCommand(int id) {
+            return getContext().getString(id);
         }
 
         /**
@@ -135,13 +136,35 @@ public class ServerListFragment extends Fragment {
             switch(connection.getState()) {
                 case Up:
                     // Make the server output constraint layout visible.
-                    serverOutputConstaintLayout.setVisibility(View.VISIBLE);
-                    connection.asyncExecCommand(Commands.Bash.loadAverage, output -> Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
+                    serverOutputConstraintLayout.setVisibility(View.VISIBLE);
+
+                    connection.addBatchCommand(getCommand(R.string.loadAverage), output -> Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
                         String[] values = output.split(",");
                         loadAvg1minTextView.setText(values[0]);
                         loadAvg5minTextView.setText(values[1]);
                         loadAvg15minTextView.setText(values[2]);
                     }));
+
+                    connection.addBatchCommand(getCommand(R.string.filesystem), output -> Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
+                        String[] values = output.replace("\n", "").split(",");
+                        int totalDiskSpace = Integer.parseInt(values[0]);
+                        int usedDiskSpace = Integer.parseInt(values[1]);
+                        float remaining = (usedDiskSpace * 100) / totalDiskSpace;
+                        filesystemTextView.setText(String.format("%.2f", remaining) + "%");
+                        if(remaining < 74.99)
+                            filesystemTextView.setTextColor(ServerConnection.States.Up.getColor(getContext()));
+                        else if(remaining < 89.99)
+                            filesystemTextView.setTextColor(ServerConnection.States.Warn.getColor(getContext()));
+                        else
+                            filesystemTextView.setTextColor(ServerConnection.States.Down.getColor(getContext()));
+                    }));
+
+                    connection.addBatchCommand(getCommand(R.string.countUsers), output -> Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
+                        countUsersTextView.setText(output);
+                    }));
+
+                    connection.runBatchCommands(POLL_RATE);
+
                     break;
                 case Warn:
                     serverExceptionTextView.setVisibility(View.VISIBLE);

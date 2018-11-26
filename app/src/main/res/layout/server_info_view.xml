@@ -86,7 +86,7 @@
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/serverName_TextView"
         app:layout_constraintVertical_bias="1.0">
@@ -123,7 +123,34 @@
             android:textColor="@color/serverUp"
             android:textSize="12sp"
             app:layout_constraintStart_toEndOf="@+id/loadAvg1min_Label"
-            app:layout_constraintTop_toBottomOf="@+id/loadAvgTitle_TextView" />
+            app:layout_constraintTop_toBottomOf="@+id/filesystem_Label" />
+
+        <TextView
+            android:id="@+id/filesystem_TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="0.00"
+            android:textColor="@color/serverUp"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/filesystem_Label"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.058" />
+
+        <TextView
+            android:id="@+id/countUsers_TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="0.00"
+            android:textColor="@color/serverUp"
+            android:textSize="14sp"
+            app:layout_constraintStart_toEndOf="@+id/filesystem_Label"
+            app:layout_constraintTop_toBottomOf="@+id/filesystem_TextView" />
 
         <TextView
             android:id="@+id/loadAvg5min_Label"
@@ -137,12 +164,32 @@
             app:layout_constraintTop_toBottomOf="@+id/loadAvg1min_Label" />
 
         <TextView
-            android:id="@+id/loadAvgTitle_TextView"
+            android:id="@+id/filesystem_Label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="12dp"
+            android:text="Used Filesystem:"
+            app:layout_constraintStart_toEndOf="@+id/loadAvgTitle_TextView2"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/countUsers_Label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="8dp"
+            android:text="# Active Users:"
+            app:layout_constraintStart_toEndOf="@+id/loadAvgTitle_TextView2"
+            app:layout_constraintTop_toBottomOf="@+id/filesystem_Label" />
+
+        <TextView
+            android:id="@+id/loadAvgTitle_TextView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="12dp"
             android:text="Load Averages"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -169,7 +216,7 @@
             android:text="1 minute:"
             android:textSize="12sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/loadAvgTitle_TextView" />
+            app:layout_constraintTop_toBottomOf="@+id/filesystem_Label" />
 
     </android.support.constraint.ConstraintLayout>
 

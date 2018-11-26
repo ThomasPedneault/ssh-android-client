@@ -1,10 +1,9 @@
 package com.example.thomaspedneault.ssh_client.model;
 
-import android.content.AsyncQueryHandler;
 import android.content.Context;
-import android.os.AsyncTask;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
 import com.example.thomaspedneault.ssh_client.R;
 import com.jcraft.jsch.Channel;
@@ -17,10 +16,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class ServerConnection {
+public class ServerConnection implements Parcelable {
 
     public enum States {
         Up(R.color.serverUp), Down(R.color.serverDown), Warn(R.color.serverWarn);
@@ -41,6 +43,7 @@ public class ServerConnection {
 
     private ServerInfo server;
     private Identity identity;
+    private List<CommandPair> batchCommands;
 
     private States state;
     private Session session;
@@ -50,14 +53,30 @@ public class ServerConnection {
         this.server = server;
         this.identity = identity;
         this.state = States.Down;
+        this.batchCommands = new ArrayList<>();
+    }
+
+    protected ServerConnection(Parcel in) {
+        this(new ServerInfo(in.readString(), in.readString()), new Identity(in.readString(), in.readString()));
     }
 
     public void asyncConnect(IOnAsyncTaskComplete asyncTaskEvent) {
         new Thread(() -> connect(asyncTaskEvent)).start();
     }
 
-    public void asyncExecCommand(String command, IOnCommandCompleteEvent commandCompleteEvent) {
-        new Thread(() -> execCommand(command, commandCompleteEvent)).start();
+    public void addBatchCommand(String command, IOnCommandCompleteEvent commandCompleteEvent) {
+        batchCommands.add(new CommandPair(command, commandCompleteEvent));
+    }
+
+    public void runBatchCommands(int pollingRate) {
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                for(CommandPair cmd : batchCommands) {
+                    execCommand(cmd.command, cmd.completeEvent);
+                }
+            }
+        }, 0, pollingRate);
     }
 
     private void connect(IOnAsyncTaskComplete asyncTaskEvent) {
@@ -163,6 +182,58 @@ public class ServerConnection {
 
     public String getExceptionMessage() {
         return lastException.getMessage();
+    }
+
+    public static final Creator<ServerConnection> CREATOR = new Creator<ServerConnection>() {
+        @Override
+        public ServerConnection createFromParcel(Parcel in) {
+            return new ServerConnection(in);
+        }
+
+        @Override
+        public ServerConnection[] newArray(int size) {
+            return new ServerConnection[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(server.getIp());
+        dest.writeString(server.getName());
+        dest.writeString(identity.getUsername());
+        dest.writeString(identity.getPassword());
+    }
+
+    private static class CommandPair {
+
+        private String command;
+        private IOnCommandCompleteEvent completeEvent;
+
+        public CommandPair(String command, IOnCommandCompleteEvent completeEvent) {
+            this.command = command;
+            this.completeEvent = completeEvent;
+        }
+
+        public String getCommand() {
+            return command;
+        }
+
+        public void setCommand(String command) {
+            this.command = command;
+        }
+
+        public IOnCommandCompleteEvent getCompleteEvent() {
+            return completeEvent;
+        }
+
+        public void setCompleteEvent(IOnCommandCompleteEvent completeEvent) {
+            this.completeEvent = completeEvent;
+        }
     }
 
 }
