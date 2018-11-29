@@ -126,7 +126,11 @@ public class ServerListFragment extends Fragment {
             countUsersTextView = root.findViewById(R.id.countUsers_TextView);
             stateCircleView = root.findViewById(R.id.state_CircleView);
 
-            root.setOnClickListener(v -> Toast.makeText(getContext(), connection.getServer().getIp(), Toast.LENGTH_SHORT).show());
+            root.setOnClickListener(v -> {
+                Intent intent = new Intent(getActivity(), TerminalActivity.class);
+                intent.putExtra("connection", connection);
+                getActivity().startActivity(intent);
+            });
         }
 
         private String getCommand(int id) {

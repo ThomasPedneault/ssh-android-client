@@ -24,6 +24,10 @@
         <activity
             android:name=".ui.ServerAddActivity"
             android:label="@string/title_activity_server_add"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ui.TerminalActivity"
+            android:label="@string/title_activity_terminal"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

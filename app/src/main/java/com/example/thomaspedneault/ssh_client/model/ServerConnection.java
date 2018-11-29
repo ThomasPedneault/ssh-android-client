@@ -79,6 +79,10 @@ public class ServerConnection implements Parcelable {
         }, 0, pollingRate);
     }
 
+    public void asyncExecCommand(String command, IOnCommandCompleteEvent commandCompleteEvent) {
+        new Thread(() -> execCommand(command, commandCompleteEvent)).start();
+    }
+
     private void connect(IOnAsyncTaskComplete asyncTaskEvent) {
         asyncTaskEvent.onBegin();
 
@@ -117,8 +121,8 @@ public class ServerConnection implements Parcelable {
 
             InputStreamReader inputStreamReader = new InputStreamReader(input);
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            String line = null;
 
+            String line = null;
             while ((line = bufferedReader.readLine()) != null) {
                 output += line + "\n";
             }
@@ -129,7 +133,6 @@ public class ServerConnection implements Parcelable {
         } catch (JSchException | IOException e) {
             output = e.getMessage();
         } finally {
-
             commandCompleteEvent.onComplete(output);
         }
     }
