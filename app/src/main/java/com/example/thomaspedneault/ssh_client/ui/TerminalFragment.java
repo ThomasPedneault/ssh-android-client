@@ -42,7 +42,8 @@ public class TerminalFragment extends Fragment {
                     EditText outputEditText = root.findViewById(R.id.output_EditText);
 
                     String command = commandEditText.getText().toString();
-                    connection.asyncExecCommand(command, output -> getActivity().runOnUiThread(() -> outputEditText.setText(output)));
+
+                    connection.asyncExecCommand(command, output -> getActivity().runOnUiThread(() -> outputEditText.setText(output != "" ? output : "Null reponse")));
                 });
 
                 // Make the console visible.

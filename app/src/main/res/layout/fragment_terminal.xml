@@ -69,6 +69,7 @@
             android:singleLine="false"
             android:textColor="@color/serverUp"
             android:textIsSelectable="false"
+            android:gravity="top"
             app:layout_constraintBottom_toTopOf="@+id/command_EditText"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
