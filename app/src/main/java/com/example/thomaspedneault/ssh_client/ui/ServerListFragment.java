@@ -103,6 +103,7 @@ public class ServerListFragment extends Fragment {
         private TextView loadAvg5minTextView;
         private TextView loadAvg15minTextView;
         private TextView filesystemTextView;
+        private TextView usedRamTextView;
         private TextView countUsersTextView;
         private final CircleView stateCircleView;
 
@@ -123,6 +124,7 @@ public class ServerListFragment extends Fragment {
             loadAvg5minTextView = root.findViewById(R.id.loadAvg5min_TextView);
             loadAvg15minTextView = root.findViewById(R.id.loadAvg15min_TextView);
             filesystemTextView = root.findViewById(R.id.filesystem_TextView);
+            usedRamTextView = root.findViewById(R.id.usedRAM_TextView);
             countUsersTextView = root.findViewById(R.id.countUsers_TextView);
             stateCircleView = root.findViewById(R.id.state_CircleView);
 
@@ -191,6 +193,12 @@ public class ServerListFragment extends Fragment {
                             filesystemTextView.setTextColor(ServerConnection.States.Warn.getColor(getContext()));
                         else
                             filesystemTextView.setTextColor(ServerConnection.States.Down.getColor(getContext()));
+                    }));
+
+                    connection.addBatchCommand(getCommand(R.string.usedRam), output -> Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
+                        String[] values = output.split("");
+                        double percentage = Double.parseDouble(values[1]) / Double.parseDouble(values[0]);
+                        //usedRamTextView.setText(String.format("%.2f", percentage) + "%");
                     }));
 
                     connection.addBatchCommand(getCommand(R.string.countUsers), output -> Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
