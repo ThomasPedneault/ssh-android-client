@@ -109,6 +109,10 @@ public class TerminalFragment extends Fragment {
 
                 // Add the command in the EditText to the list of saved commands.
                 saveButton.setOnClickListener(v -> {
+                    // If the command is empty, do nothing.
+                    if(commandEditText.getText().toString() == "")
+                        return;
+
                     savedCommands.add(commandEditText.getText().toString());
 
                     // Close the keyboard.
