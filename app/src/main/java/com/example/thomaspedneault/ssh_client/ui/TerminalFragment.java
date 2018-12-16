@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.service.autofill.SaveCallback;
@@ -42,25 +43,27 @@ import java.util.Objects;
 public class TerminalFragment extends Fragment {
 
     private static final String OUTPUT_LINE_PREFIX = "";
+
     @SuppressLint("SimpleDateFormat")
     public static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("[HH:mm:ss]");
 
     private EditText outputEditText;
     private EditText commandEditText;
     private Button executeButton;
+    private Button saveButton;
     private Dialog savedCommandsDialog;
 
     private ServerConnection connection;
+    private List<String> savedCommands;
 
-    public TerminalFragment() { }
+    public TerminalFragment() {
+        savedCommands = SampleData.getSavedCommands();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_terminal, container, false);
-
-        outputEditText = root.findViewById(R.id.output_EditText);
-        outputEditText.setShowSoftInputOnFocus(false);
 
         // Get server connection and establish it.
         connection = getActivity().getIntent().getParcelableExtra("connection");
@@ -72,7 +75,10 @@ public class TerminalFragment extends Fragment {
             public void onComplete(ServerConnection.States state) {
                 // Set the event listeners for the UI elements.
                 executeButton = root.findViewById(R.id.execute_Button);
+                saveButton = root.findViewById(R.id.save_Button);
                 commandEditText = root.findViewById(R.id.command_EditText);
+                outputEditText = root.findViewById(R.id.output_EditText);
+                outputEditText.setShowSoftInputOnFocus(false);
 
                 commandEditText.setOnKeyListener((v, keyCode, event) -> {
                     if(event.getAction() == KeyEvent.ACTION_DOWN) {
@@ -88,6 +94,7 @@ public class TerminalFragment extends Fragment {
                     return false;
                 });
 
+                // Execute the command in the EditText and display the output.
                 executeButton.setOnClickListener(v -> {
                     String command = commandEditText.getText().toString();
 
@@ -98,6 +105,17 @@ public class TerminalFragment extends Fragment {
                             Objects.requireNonNull(getActivity().getCurrentFocus()).getWindowToken(), 0);
 
                     runCommand(command);
+                });
+
+                // Add the command in the EditText to the list of saved commands.
+                saveButton.setOnClickListener(v -> {
+                    savedCommands.add(commandEditText.getText().toString());
+
+                    // Close the keyboard.
+                    InputMethodManager inputManager = (InputMethodManager)
+                            getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+                    Objects.requireNonNull(inputManager).hideSoftInputFromWindow(
+                            Objects.requireNonNull(getActivity().getCurrentFocus()).getWindowToken(), 0);
                 });
 
                 // Set the event listener to display the command selection.
@@ -111,14 +129,16 @@ public class TerminalFragment extends Fragment {
                         savedCommandsDialog.setCancelable(true);
                     }
 
-                    savedCommandsDialog.show();
-
                     RecyclerView rv = savedCommandsDialog.findViewById(R.id.savedCommands_RecyclerView);
                     rv.setHasFixedSize(true);
                     rv.setLayoutManager(new LinearLayoutManager(getContext()));
 
-                    SavedCommandAdapter savedCommandAdapter = new SavedCommandAdapter(SampleData.getSavedCommands());
+                    SavedCommandAdapter savedCommandAdapter = new SavedCommandAdapter(savedCommands);
                     rv.setAdapter(savedCommandAdapter);
+
+                    // Update the data in the adapter in case it was changed.
+                    savedCommandAdapter.notifyDataSetChanged();
+                    savedCommandsDialog.show();
 
                     return true;
                 });
@@ -157,19 +177,42 @@ public class TerminalFragment extends Fragment {
         private TextView commandNameTextView;
 
         private String command;
+        private int index;
 
         public SavedCommandHolder(@NonNull View itemView) {
             super(itemView);
             root = itemView;
             commandNameTextView = root.findViewById(R.id.commandName_TextView);
+
+            // Run the command if it is clicked.
             commandNameTextView.setOnClickListener(v -> {
                 runCommand(command);
                 savedCommandsDialog.dismiss();
             });
+
+            // Prompt the user to delete the command.
+            commandNameTextView.setOnLongClickListener(v -> {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setMessage("Would you like to delete this command?")
+                        .setTitle(commandNameTextView.getText().toString())
+                        .setPositiveButton("Delete", (dialog, which) -> {
+                            savedCommands.remove(this.index);
+
+                            // Notify the adapter that the data changed.
+                            RecyclerView rv = savedCommandsDialog.findViewById(R.id.savedCommands_RecyclerView);
+                            rv.getAdapter().notifyDataSetChanged();
+                        })
+                        .setNegativeButton("Cancel", (dialog, which) -> {
+                            // Do nothing
+                        });
+                builder.create().show();
+                return true;
+            });
         }
 
-        public void setCommand(String command) {
-            this.command = command;
+        public void setCommand(int index) {
+            this.index = index;
+            this.command = savedCommands.get(index);
             this.commandNameTextView.setText(command);
         }
     }
@@ -191,12 +234,21 @@ public class TerminalFragment extends Fragment {
         @NonNull
         @Override
         public void onBindViewHolder(@NonNull SavedCommandHolder holder, int i) {
-            holder.setCommand(savedCommands.get(i));
+            holder.setCommand(i);
         }
 
         @Override
         public int getItemCount() {
             return savedCommands.size();
+        }
+
+        public void addCommand(String command) {
+            savedCommands.add(command);
+            this.notifyDataSetChanged();
+        }
+
+        public List<String> getSavedCommands() {
+            return this.savedCommands;
         }
     }
 }

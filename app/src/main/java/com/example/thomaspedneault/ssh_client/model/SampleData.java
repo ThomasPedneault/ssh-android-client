@@ -19,24 +19,11 @@ public class SampleData {
     public static List<String> getSavedCommands() {
         List<String> commands = new ArrayList<>();
 
-        commands.add("ls -al");
-        commands.add("echo hello world");
-        commands.add("echo 123");
-        commands.add("ls -al");
-        commands.add("echo hello world");
-        commands.add("echo 123");
-        commands.add("ls -al");
-        commands.add("echo hello world");
-        commands.add("echo 123");
-        commands.add("ls -al");
-        commands.add("echo hello world");
-        commands.add("echo 123");
-        commands.add("ls -al");
-        commands.add("echo hello world");
-        commands.add("echo 123");
-        commands.add("ls -al");
-        commands.add("echo hello world");
-        commands.add("echo 123");
+        commands.add("clear");
+        commands.add("ls");
+        commands.add("echo foo");
+        commands.add("echo bar");
+        commands.add("echo garply");
 
         return commands;
     }
