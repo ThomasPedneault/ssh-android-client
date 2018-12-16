@@ -196,9 +196,10 @@ public class ServerListFragment extends Fragment {
                     }));
 
                     connection.addBatchCommand(getCommand(R.string.usedRam), output -> Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
-                        String[] values = output.split("");
-                        double percentage = Double.parseDouble(values[1]) / Double.parseDouble(values[0]);
-                        //usedRamTextView.setText(String.format("%.2f", percentage) + "%");
+                        String[] values = output.split(" ");
+                        double percentage = (Double.parseDouble(values[1]) / Double.parseDouble(values[0])) * 100;
+                        String value = String.format("%.2f", percentage);
+                        usedRamTextView.setText(value + "%");
                     }));
 
                     connection.addBatchCommand(getCommand(R.string.countUsers), output -> Objects.requireNonNull(getActivity()).runOnUiThread(() -> {

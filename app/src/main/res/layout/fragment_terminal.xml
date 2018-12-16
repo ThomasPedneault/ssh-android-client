@@ -90,7 +90,6 @@
             android:inputType="none"
             android:singleLine="false"
             android:textColor="@color/serverUp"
-            android:textIsSelectable="false"
             app:layout_constraintBottom_toTopOf="@+id/command_EditText"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

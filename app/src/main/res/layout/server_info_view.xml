@@ -45,19 +45,13 @@
         android:id="@+id/state_CircleView"
         class="com.example.thomaspedneault.ssh_client.util.CircleView"
         id="@+id/view"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
         app:circleColor="@android:color/holo_red_light"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/serverIp_TextView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="@+id/serverIp_TextView" />
 
     <TextView
         android:id="@+id/serverException_TextView"
@@ -93,13 +87,14 @@
 
         <TextView
             android:id="@+id/usedRAM_TextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="28dp"
+            android:layout_height="17dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
             android:text="0.00"
             android:textColor="@color/serverUp"
             android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="@+id/countUsers_TextView"
+            app:layout_constraintStart_toEndOf="@+id/filesystem_Label"
             app:layout_constraintTop_toBottomOf="@+id/filesystem_TextView" />
 
         <TextView

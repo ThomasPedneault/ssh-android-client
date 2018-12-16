@@ -32,12 +32,16 @@ public class TerminalFragment extends Fragment {
     @SuppressLint("SimpleDateFormat")
     public static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("[HH:mm:ss]");
 
+    private EditText outputEditText;
+
     public TerminalFragment() { }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_terminal, container, false);
+        outputEditText = root.findViewById(R.id.output_EditText);
+        outputEditText.setShowSoftInputOnFocus(false);
 
         // Get server connection and establish it.
         ServerConnection connection = getActivity().getIntent().getParcelableExtra("connection");
@@ -66,8 +70,6 @@ public class TerminalFragment extends Fragment {
                 });
 
                 executeButton.setOnClickListener(v -> {
-                    EditText outputEditText = root.findViewById(R.id.output_EditText);
-
                     String command = commandEditText.getText().toString();
 
                     // Close the keyboard.
