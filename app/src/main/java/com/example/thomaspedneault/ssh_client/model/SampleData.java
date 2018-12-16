@@ -15,4 +15,29 @@ public class SampleData {
 
         return connections;
     }
+
+    public static List<String> getSavedCommands() {
+        List<String> commands = new ArrayList<>();
+
+        commands.add("ls -al");
+        commands.add("echo hello world");
+        commands.add("echo 123");
+        commands.add("ls -al");
+        commands.add("echo hello world");
+        commands.add("echo 123");
+        commands.add("ls -al");
+        commands.add("echo hello world");
+        commands.add("echo 123");
+        commands.add("ls -al");
+        commands.add("echo hello world");
+        commands.add("echo 123");
+        commands.add("ls -al");
+        commands.add("echo hello world");
+        commands.add("echo 123");
+        commands.add("ls -al");
+        commands.add("echo hello world");
+        commands.add("echo 123");
+
+        return commands;
+    }
 }

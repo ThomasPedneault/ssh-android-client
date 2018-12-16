@@ -2,24 +2,38 @@ package com.example.thomaspedneault.ssh_client.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.service.autofill.SaveCallback;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.thomaspedneault.ssh_client.R;
 import com.example.thomaspedneault.ssh_client.model.IOnAsyncTaskComplete;
 import com.example.thomaspedneault.ssh_client.model.IOnCommandCompleteEvent;
+import com.example.thomaspedneault.ssh_client.model.SampleData;
 import com.example.thomaspedneault.ssh_client.model.ServerConnection;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -27,12 +41,16 @@ import java.util.Objects;
  */
 public class TerminalFragment extends Fragment {
 
-    private static final String OUTPUT_LINE_PREFIX = ">";
-
+    private static final String OUTPUT_LINE_PREFIX = "";
     @SuppressLint("SimpleDateFormat")
     public static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("[HH:mm:ss]");
 
     private EditText outputEditText;
+    private EditText commandEditText;
+    private Button executeButton;
+    private Dialog savedCommandsDialog;
+
+    private ServerConnection connection;
 
     public TerminalFragment() { }
 
@@ -40,11 +58,12 @@ public class TerminalFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_terminal, container, false);
+
         outputEditText = root.findViewById(R.id.output_EditText);
         outputEditText.setShowSoftInputOnFocus(false);
 
         // Get server connection and establish it.
-        ServerConnection connection = getActivity().getIntent().getParcelableExtra("connection");
+        connection = getActivity().getIntent().getParcelableExtra("connection");
         connection.asyncConnect(new IOnAsyncTaskComplete() {
             @Override
             public void onBegin() { }
@@ -52,8 +71,8 @@ public class TerminalFragment extends Fragment {
             @Override
             public void onComplete(ServerConnection.States state) {
                 // Set the event listeners for the UI elements.
-                Button executeButton = root.findViewById(R.id.execute_Button);
-                EditText commandEditText = root.findViewById(R.id.command_EditText);
+                executeButton = root.findViewById(R.id.execute_Button);
+                commandEditText = root.findViewById(R.id.command_EditText);
 
                 commandEditText.setOnKeyListener((v, keyCode, event) -> {
                     if(event.getAction() == KeyEvent.ACTION_DOWN) {
@@ -78,21 +97,30 @@ public class TerminalFragment extends Fragment {
                     Objects.requireNonNull(inputManager).hideSoftInputFromWindow(
                             Objects.requireNonNull(getActivity().getCurrentFocus()).getWindowToken(), 0);
 
-                    // Check if the command is to clear the console.
-                    if(command.equals("clear")) {
-                        outputEditText.setText("");
-                        return;
+                    runCommand(command);
+                });
+
+                // Set the event listener to display the command selection.
+                outputEditText.setOnLongClickListener(v -> {
+                    if(savedCommandsDialog == null) {
+                        savedCommandsDialog = new Dialog(getContext(), R.style.DialogSlideAnim);
+                        savedCommandsDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        savedCommandsDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        savedCommandsDialog.setContentView(R.layout.saved_commands_view);
+                        savedCommandsDialog.setCanceledOnTouchOutside(true);
+                        savedCommandsDialog.setCancelable(true);
                     }
 
-                    connection.asyncExecCommand(command, output -> getActivity().runOnUiThread(() ->
-                    {
-                        String prefix = DATE_FORMAT.format(new Date()) + " " + connection.getIdentity().getUsername();
-                        outputEditText.append(prefix + ": " + command + "\n");
-                        String[] lines = output.split("\n");
-                        for (String line : lines) {
-                            outputEditText.append(OUTPUT_LINE_PREFIX + line + "\n");
-                        }
-                    }));
+                    savedCommandsDialog.show();
+
+                    RecyclerView rv = savedCommandsDialog.findViewById(R.id.savedCommands_RecyclerView);
+                    rv.setHasFixedSize(true);
+                    rv.setLayoutManager(new LinearLayoutManager(getContext()));
+
+                    SavedCommandAdapter savedCommandAdapter = new SavedCommandAdapter(SampleData.getSavedCommands());
+                    rv.setAdapter(savedCommandAdapter);
+
+                    return true;
                 });
 
                 // Make the console visible.
@@ -104,5 +132,71 @@ public class TerminalFragment extends Fragment {
         });
 
         return root;
+    }
+
+    private void runCommand(String command) {
+        // Check if the command is to clear the console.
+        if(command.equals("clear")) {
+            outputEditText.setText("");
+            return;
+        }
+
+        connection.asyncExecCommand(command, output -> getActivity().runOnUiThread(() ->
+        {
+            String prefix = DATE_FORMAT.format(new Date()) + " " + connection.getIdentity().getUsername();
+            outputEditText.append(prefix + ": " + command + "\n");
+            String[] lines = output.split("\n");
+            for (String line : lines) {
+                outputEditText.append(OUTPUT_LINE_PREFIX + line + "\n");
+            }
+        }));
+    }
+
+    private class SavedCommandHolder extends RecyclerView.ViewHolder {
+        private View root;
+        private TextView commandNameTextView;
+
+        private String command;
+
+        public SavedCommandHolder(@NonNull View itemView) {
+            super(itemView);
+            root = itemView;
+            commandNameTextView = root.findViewById(R.id.commandName_TextView);
+            commandNameTextView.setOnClickListener(v -> {
+                runCommand(command);
+                savedCommandsDialog.dismiss();
+            });
+        }
+
+        public void setCommand(String command) {
+            this.command = command;
+            this.commandNameTextView.setText(command);
+        }
+    }
+
+    private class SavedCommandAdapter extends RecyclerView.Adapter<SavedCommandHolder> {
+        private List<String> savedCommands;
+
+        public SavedCommandAdapter(List<String> commands) { this.savedCommands = commands; }
+
+        @NonNull
+        @Override
+        public SavedCommandHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+            return new SavedCommandHolder(
+                    LayoutInflater.from(viewGroup.getContext())
+                            .inflate(R.layout.command_view, viewGroup, false)
+            );
+        }
+
+        @NonNull
+        @Override
+        public void onBindViewHolder(@NonNull SavedCommandHolder holder, int i) {
+            holder.setCommand(savedCommands.get(i));
+        }
+
+        @Override
+        public int getItemCount() {
+            return savedCommands.size();
+        }
     }
 }
