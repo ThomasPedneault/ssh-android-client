@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,9 +22,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.thomaspedneault.ssh_client.R;
+import com.example.thomaspedneault.ssh_client.model.CommandLog;
+import com.example.thomaspedneault.ssh_client.model.CommandLogDatabaseHandler;
 import com.example.thomaspedneault.ssh_client.model.IOnAsyncTaskComplete;
 import com.example.thomaspedneault.ssh_client.model.SampleData;
 import com.example.thomaspedneault.ssh_client.model.ServerConnection;
+import com.example.thomaspedneault.ssh_client.sqlite.DatabaseException;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -46,6 +50,7 @@ public class TerminalFragment extends Fragment {
     private Button saveButton;
     private Dialog savedCommandsDialog;
 
+    private CommandLogDatabaseHandler dbh;
     private ServerConnection connection;
     private List<String> savedCommands;
 
@@ -57,6 +62,9 @@ public class TerminalFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_terminal, container, false);
+
+        // Create the database handler.
+        dbh = new CommandLogDatabaseHandler(getContext());
 
         // Get server connection and establish it.
         connection = getActivity().getIntent().getParcelableExtra("connection");
@@ -72,6 +80,24 @@ public class TerminalFragment extends Fragment {
                 commandEditText = root.findViewById(R.id.command_EditText);
                 outputEditText = root.findViewById(R.id.output_EditText);
                 outputEditText.setShowSoftInputOnFocus(false);
+
+                // Add the previous run commands.
+                List<CommandLog> commandLogs = null;
+                try {
+                    commandLogs = dbh.getCommandLogTable().readAll();
+                    for (CommandLog logged : commandLogs) {
+                        if(logged.getServerIp().equals(connection.getServer().getIp()) &&
+                                logged.getUsername().equals(connection.getIdentity().getUsername())) {
+                            getActivity().runOnUiThread(() -> {
+                                String prefix = DATE_FORMAT.format(new Date()) + " " + logged.getUsername();
+                                outputEditText.append(prefix + ": " + logged.getCommand() + "\n");
+                                outputEditText.append(logged.getOutput());
+                            });
+                        }
+                    }
+                } catch (DatabaseException e) {
+                    e.printStackTrace();
+                }
 
                 commandEditText.setOnKeyListener((v, keyCode, event) -> {
                     if(event.getAction() == KeyEvent.ACTION_DOWN) {
@@ -165,6 +191,14 @@ public class TerminalFragment extends Fragment {
             String[] lines = output.split("\n");
             for (String line : lines) {
                 outputEditText.append(OUTPUT_LINE_PREFIX + line + "\n");
+            }
+
+            try {
+                dbh.getCommandLogTable().create(new CommandLog(connection.getServer().getIp(), connection.getIdentity().getUsername(), command, output, new Date()));
+                Log.w("TERMINAL_LOG", "Logged command: " + command);
+            } catch (DatabaseException e) {
+                Log.e("TERMINAL_LOG", "Failed to log command. " + e.getMessage());
+                e.printStackTrace();
             }
         }));
     }

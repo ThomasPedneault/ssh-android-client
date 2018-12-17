@@ -1,4 +1,4 @@
-package ca.qc.johnabbott.cs616.notes.sqlite;
+package com.example.thomaspedneault.ssh_client.sqlite;
 
 import java.text.ParseException;
 

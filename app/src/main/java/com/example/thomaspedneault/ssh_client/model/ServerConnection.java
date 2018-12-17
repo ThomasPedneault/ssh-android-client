@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
@@ -113,7 +114,7 @@ public class ServerConnection implements Parcelable {
 
             asyncTaskEvent.onComplete(States.Up);
         }
-        catch (JSchException e) {
+        catch(Exception e) {
             this.lastException = e;
             asyncTaskEvent.onComplete(States.Warn);
         }
@@ -142,6 +143,7 @@ public class ServerConnection implements Parcelable {
             bufferedReader.close();
             inputStreamReader.close();
             channel.disconnect();
+
         } catch (JSchException | IOException e) {
             output = e.getMessage();
         } finally {

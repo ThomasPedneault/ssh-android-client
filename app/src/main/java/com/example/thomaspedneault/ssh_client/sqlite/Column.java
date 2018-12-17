@@ -1,4 +1,4 @@
-package ca.qc.johnabbott.cs616.notes.sqlite;
+package com.example.thomaspedneault.ssh_client.sqlite;
 
 /**
  * Represents a column in an sqlite database.

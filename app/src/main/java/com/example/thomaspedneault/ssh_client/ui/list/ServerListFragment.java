@@ -229,6 +229,7 @@ public class ServerListFragment extends Fragment {
 
                     connection.addBatchCommand(getCommand(R.string.filesystem), output -> Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
                         String[] values = output.replace("\n", "").split(",");
+                        Log.w("FILESYSTEM : " + connection.getServer().getIp(), values[0] + ", " + values[1]);
                         int totalDiskSpace = Integer.parseInt(values[0]);
                         int usedDiskSpace = Integer.parseInt(values[1]);
                         float remaining = (usedDiskSpace * 100) / totalDiskSpace;

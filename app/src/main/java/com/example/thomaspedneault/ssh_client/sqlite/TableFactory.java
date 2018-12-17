@@ -3,7 +3,7 @@
  */
 
 
-package ca.qc.johnabbott.cs616.notes.sqlite;
+package com.example.thomaspedneault.ssh_client.sqlite;
 
 import android.content.ContentValues;
 import android.database.Cursor;
