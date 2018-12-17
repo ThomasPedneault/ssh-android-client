@@ -8,4 +8,5 @@
     <color name="serverDown">#FF0000</color>
     <color name="serverWarn">#FFBB44</color>
     <color name="serverViewBackground">#75715e</color>
+    <color name="noServersAvailable">#4675715e</color>
 </resources>

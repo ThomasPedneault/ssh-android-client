@@ -129,7 +129,7 @@ public class TerminalFragment extends Fragment {
                 // Add the command in the EditText to the list of saved commands.
                 saveButton.setOnClickListener(v -> {
                     // If the command is empty, do nothing.
-                    if(commandEditText.getText().toString() == "")
+                    if(commandEditText.getText().toString().matches(""))
                         return;
 
                     savedCommands.add(commandEditText.getText().toString());

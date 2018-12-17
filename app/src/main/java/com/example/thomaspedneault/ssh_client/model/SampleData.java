@@ -5,22 +5,6 @@ import java.util.List;
 
 public class SampleData {
 
-    public static List<ServerConnection> getServerConnections() {
-        List<ServerConnection> connections = new ArrayList<>();
-
-        connections.add(new ServerConnection(
-                new ServerInfo("linux2-cs.johnabbott.qc.ca", "Linux2"),
-                new Identity("1621638", "Stella1414"))
-        );
-
-        connections.add(new ServerConnection(
-                new ServerInfo("10.39.167.25", "UNIX"),
-                new Identity("android", "android"))
-        );
-
-        return connections;
-    }
-
     public static List<String> getSavedCommands() {
         List<String> commands = new ArrayList<>();
 
@@ -32,4 +16,5 @@ public class SampleData {
 
         return commands;
     }
+
 }

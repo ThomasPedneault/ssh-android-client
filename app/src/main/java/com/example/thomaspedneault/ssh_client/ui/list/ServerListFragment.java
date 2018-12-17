@@ -22,6 +22,8 @@ import com.example.thomaspedneault.ssh_client.R;
 import com.example.thomaspedneault.ssh_client.model.IOnAsyncTaskComplete;
 import com.example.thomaspedneault.ssh_client.model.SampleData;
 import com.example.thomaspedneault.ssh_client.model.ServerConnection;
+import com.example.thomaspedneault.ssh_client.networking.HttpRequestBuilder;
+import com.example.thomaspedneault.ssh_client.networking.HttpResponse;
 import com.example.thomaspedneault.ssh_client.ui.terminal.TerminalActivity;
 import com.example.thomaspedneault.ssh_client.ui.add.ServerAddActivity;
 import com.example.thomaspedneault.ssh_client.util.CircleView;
@@ -39,16 +41,21 @@ public class ServerListFragment extends Fragment {
 
     private List<ServerConnection> servers;
 
+    private TextView noServersTextView;
     private RecyclerView serversRecyclerView;
     private ServerAdapter serverAdapter;
     private FloatingActionButton addServerFab;
 
     public ServerListFragment() {
         servers = new ArrayList<>();
-        servers.addAll(SampleData.getServerConnections());
     }
 
     public void addServerConnection(ServerConnection connection) {
+        // We are adding a new connection, so hide the message that there are no connections.
+        if(servers.size() <= 0) {
+            noServersTextView.setVisibility(View.GONE);
+        }
+
         servers.add(connection);
         serverAdapter.notifyDataSetChanged();
     }
@@ -58,6 +65,7 @@ public class ServerListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_server_list, container, false);
 
+        // Get the RecyclerView and display the connections inside of it.
         serversRecyclerView = root.findViewById(R.id.servers_RecyclerView);
         serversRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -66,6 +74,12 @@ public class ServerListFragment extends Fragment {
 
         serverAdapter = new ServerAdapter(servers);
         serversRecyclerView.setAdapter(serverAdapter);
+
+        // Check if there are connections.
+        noServersTextView = root.findViewById(R.id.noServers_TextView);
+        if(servers.size() <= 0) {
+            noServersTextView.setVisibility(View.VISIBLE);
+        }
 
         addServerFab = root.findViewById(R.id.addServer_Fab);
         addServerFab.setOnClickListener(v -> {
@@ -78,12 +92,10 @@ public class ServerListFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Toast.makeText(getContext(), "Reached onActivityResult", Toast.LENGTH_SHORT).show();
         super.onActivityResult(requestCode, resultCode, data);
         switch(requestCode) {
             case ServerListActivity.NEW_SERVER_REQUEST:
                 if(resultCode == Activity.RESULT_OK) {
-                    Toast.makeText(getContext(), "Reached NEW_SERVER_REQUEST", Toast.LENGTH_SHORT).show();
                     ServerConnection connection = data.getParcelableExtra("connection");
                     addServerConnection(connection);
                 }
@@ -91,8 +103,8 @@ public class ServerListFragment extends Fragment {
             case ServerListActivity.EDIT_SERVER_REQUEST:
                 if(resultCode == Activity.RESULT_OK) {
                     ServerConnection connection = data.getParcelableExtra("connection");
-                    Toast.makeText(getContext(), connection.toString(), Toast.LENGTH_SHORT).show();
                     for(int i = 0; i < servers.size(); i++) {
+                        // Replace the edited connection with the new one.
                         if(servers.get(i).getId() == connection.getId()) {
                             servers.remove(i);
                             servers.add(i, connection);
@@ -103,7 +115,6 @@ public class ServerListFragment extends Fragment {
                 }
                 break;
             default:
-                Toast.makeText(getContext(),"Invalid Request Returned", Toast.LENGTH_SHORT).show();
                 break;
         }
     }
@@ -149,12 +160,14 @@ public class ServerListFragment extends Fragment {
             countUsersTextView = root.findViewById(R.id.countUsers_TextView);
             stateCircleView = root.findViewById(R.id.state_CircleView);
 
+            // Set to onclick event for the connection view.
             root.setOnClickListener(v -> {
                 Intent intent = new Intent(getActivity(), TerminalActivity.class);
                 intent.putExtra("connection", connection);
                 getActivity().startActivity(intent);
             });
 
+            // Set the onlongclick event for the connection view.
             root.setOnLongClickListener(v -> {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle("Select an Action")
@@ -220,6 +233,7 @@ public class ServerListFragment extends Fragment {
                     // Make the server output constraint layout visible.
                     serverOutputConstraintLayout.setVisibility(View.VISIBLE);
 
+                    // Add the command to fetch the load average from the server and display it to the user.
                     connection.addBatchCommand(getCommand(R.string.loadAverage), output -> Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
                         String[] values = output.split(",");
                         loadAvg1minTextView.setText(values[0]);
@@ -227,9 +241,9 @@ public class ServerListFragment extends Fragment {
                         loadAvg15minTextView.setText(values[2]);
                     }));
 
+                    // Add the command to fetch the remaining disk space and display it to the user.
                     connection.addBatchCommand(getCommand(R.string.filesystem), output -> Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
                         String[] values = output.replace("\n", "").split(",");
-                        Log.w("FILESYSTEM : " + connection.getServer().getIp(), values[0] + ", " + values[1]);
                         int totalDiskSpace = Integer.parseInt(values[0]);
                         int usedDiskSpace = Integer.parseInt(values[1]);
                         float remaining = (usedDiskSpace * 100) / totalDiskSpace;
@@ -242,6 +256,7 @@ public class ServerListFragment extends Fragment {
                             filesystemTextView.setTextColor(ServerConnection.States.Down.getColor(getContext()));
                     }));
 
+                    // Add the command to get the percentage of used RAM on the server and display it to the user.
                     connection.addBatchCommand(getCommand(R.string.usedRam), output -> Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
                         String[] values = output.split(" ");
                         double percentage = (Double.parseDouble(values[1]) / Double.parseDouble(values[0])) * 100;
@@ -249,10 +264,12 @@ public class ServerListFragment extends Fragment {
                         usedRamTextView.setText(value + "%");
                     }));
 
+                    // Add the command to fetch the number of connected users on the server (excluding this client) and display it to the user.
                     connection.addBatchCommand(getCommand(R.string.countUsers), output -> Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
                         countUsersTextView.setText(output);
                     }));
 
+                    // Start executing all the previously added commands every n milliseconds.
                     connection.runBatchCommands(POLL_RATE);
                     break;
                 case Warn:

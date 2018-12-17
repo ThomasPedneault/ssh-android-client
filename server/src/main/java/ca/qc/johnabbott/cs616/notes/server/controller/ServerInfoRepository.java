@@ -1,6 +1,6 @@
-package ca.qc.johnabbott.cs616.defects.server.controller;
+package ca.qc.johnabbott.cs616.notes.server.controller;
 
-import ca.qc.johnabbott.cs616.defects.server.model.ServerInfo;
+import ca.qc.johnabbott.cs616.notes.server.model.ServerInfo;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
