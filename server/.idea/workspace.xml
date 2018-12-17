@@ -1,36 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0ad16cf1-c3ac-4b6a-92ba-338a8d3915e5" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/thomaspedneault/ssh_client/networking/HttpRequestBuilder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/thomaspedneault/ssh_client/networking/HttpResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/thomaspedneault/ssh_client/networking/ServerConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/thomaspedneault/ssh_client/networking/ServerException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/thomaspedneault/ssh_client/util/StringUtils.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ca/qc/johnabbott/cs616/notes/server/controller/IdentityRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ca/qc/johnabbott/cs616/notes/server/controller/ServerConnectionRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ca/qc/johnabbott/cs616/notes/server/controller/ServerInfoRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ca/qc/johnabbott/cs616/notes/server/model/Identity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ca/qc/johnabbott/cs616/notes/server/model/ServerConnection.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ca/qc/johnabbott/cs616/notes/server/model/ServerInfo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/thomaspedneault/ssh_client/ui/list/ServerListFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/thomaspedneault/ssh_client/ui/list/ServerListFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/classes/ca/qc/johnabbott/cs616/defects/server/Application.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/classes/ca/qc/johnabbott/cs616/defects/server/controller/ServerInfoRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/classes/ca/qc/johnabbott/cs616/defects/server/model/ServerInfo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/resources/data.sql" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/resources/data.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/test/classes/com/example/demo/DemoApplicationTests.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/test/classes/com/example/demo/DemoApplicationTests.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ca/qc/johnabbott/cs616/defects/server/Application.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ca/qc/johnabbott/cs616/defects/server/controller/ServerInfoRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ca/qc/johnabbott/cs616/defects/server/model/ServerInfo.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data.sql" afterDir="false" />
-    </list>
+    <list default="true" id="0ad16cf1-c3ac-4b6a-92ba-338a8d3915e5" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/.gradle/" />
     <ignored path="$PROJECT_DIR$/build/" />
     <ignored path="$PROJECT_DIR$/out/" />
@@ -49,6 +20,7 @@
     <session id="533565595">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
+          <entry key="project.closed" value="1" />
           <entry key="project.open.time.1" value="1" />
           <entry key="project.opened" value="1" />
         </counts>
@@ -597,7 +569,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="49" />
     <option name="y" value="-14" />
     <option name="width" value="1788" />
@@ -676,7 +648,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1545085666993" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1545085684676" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RecentsManager">
@@ -731,7 +703,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Image Layers" />
       <window_info id="Designer" />
@@ -747,7 +718,7 @@
       <window_info anchor="bottom" id="Messages" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.329718" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.329718" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
