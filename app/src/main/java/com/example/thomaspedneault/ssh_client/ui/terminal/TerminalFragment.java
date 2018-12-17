@@ -1,38 +1,31 @@
-package com.example.thomaspedneault.ssh_client.ui;
+package com.example.thomaspedneault.ssh_client.ui.terminal;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.service.autofill.SaveCallback;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.thomaspedneault.ssh_client.R;
 import com.example.thomaspedneault.ssh_client.model.IOnAsyncTaskComplete;
-import com.example.thomaspedneault.ssh_client.model.IOnCommandCompleteEvent;
 import com.example.thomaspedneault.ssh_client.model.SampleData;
 import com.example.thomaspedneault.ssh_client.model.ServerConnection;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -244,15 +237,6 @@ public class TerminalFragment extends Fragment {
         @Override
         public int getItemCount() {
             return savedCommands.size();
-        }
-
-        public void addCommand(String command) {
-            savedCommands.add(command);
-            this.notifyDataSetChanged();
-        }
-
-        public List<String> getSavedCommands() {
-            return this.savedCommands;
         }
     }
 }

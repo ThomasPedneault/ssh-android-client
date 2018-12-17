@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.ServerListFragment"
+    tools:context=".ui.list.ServerListFragment"
     tools:showIn="@layout/activity_server_list">
 
     <android.support.design.widget.FloatingActionButton

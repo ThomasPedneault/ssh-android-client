@@ -5,7 +5,7 @@
     android:id="@+id/terminalMain_ConstraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.TerminalFragment"
+    tools:context=".ui.terminal.TerminalFragment"
     tools:showIn="@layout/activity_terminal">
 
     <android.support.constraint.ConstraintLayout

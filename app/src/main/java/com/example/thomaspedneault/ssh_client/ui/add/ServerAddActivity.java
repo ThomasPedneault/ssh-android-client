@@ -1,4 +1,4 @@
-package com.example.thomaspedneault.ssh_client.ui;
+package com.example.thomaspedneault.ssh_client.ui.add;
 
 import android.app.Activity;
 import android.content.Intent;

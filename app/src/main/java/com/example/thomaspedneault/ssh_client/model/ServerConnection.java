@@ -41,6 +41,9 @@ public class ServerConnection implements Parcelable {
     private static final int SSH_PORT = 22;
     private static final int TIMEOUT = 30000;
 
+    private static int nextId = 1;
+
+    private int id;
     private ServerInfo server;
     private Identity identity;
     private List<CommandPair> batchCommands;
@@ -50,6 +53,15 @@ public class ServerConnection implements Parcelable {
     private Exception lastException;
 
     public ServerConnection(ServerInfo server, Identity identity) {
+        this.id = nextId++;
+        this.server = server;
+        this.identity = identity;
+        this.state = States.Down;
+        this.batchCommands = new ArrayList<>();
+    }
+
+    public ServerConnection(int id, ServerInfo server, Identity identity) {
+        this.id = id;
         this.server = server;
         this.identity = identity;
         this.state = States.Down;
@@ -57,7 +69,7 @@ public class ServerConnection implements Parcelable {
     }
 
     protected ServerConnection(Parcel in) {
-        this(new ServerInfo(in.readString(), in.readString()), new Identity(in.readString(), in.readString()));
+        this(in.readInt(), new ServerInfo(in.readString(), in.readString()), new Identity(in.readString(), in.readString()));
     }
 
     public void asyncConnect(IOnAsyncTaskComplete asyncTaskEvent) {
@@ -140,7 +152,8 @@ public class ServerConnection implements Parcelable {
     @Override
     public String toString() {
         return "ServerConnection{" +
-                "server=" + server +
+                "id=" + id +
+                ",server=" + server +
                 ", identity=" + identity +
                 '}';
     }
@@ -158,6 +171,8 @@ public class ServerConnection implements Parcelable {
     public int hashCode() {
         return Objects.hash(server, identity);
     }
+
+    public int getId() { return id; }
 
     public States getState() {
         return state;
@@ -206,6 +221,7 @@ public class ServerConnection implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
         dest.writeString(server.getIp());
         dest.writeString(server.getName());
         dest.writeString(identity.getUsername());

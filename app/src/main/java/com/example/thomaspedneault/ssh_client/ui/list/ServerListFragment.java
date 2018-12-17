@@ -1,6 +1,7 @@
-package com.example.thomaspedneault.ssh_client.ui;
+package com.example.thomaspedneault.ssh_client.ui.list;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
@@ -10,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +22,8 @@ import com.example.thomaspedneault.ssh_client.R;
 import com.example.thomaspedneault.ssh_client.model.IOnAsyncTaskComplete;
 import com.example.thomaspedneault.ssh_client.model.SampleData;
 import com.example.thomaspedneault.ssh_client.model.ServerConnection;
+import com.example.thomaspedneault.ssh_client.ui.terminal.TerminalActivity;
+import com.example.thomaspedneault.ssh_client.ui.add.ServerAddActivity;
 import com.example.thomaspedneault.ssh_client.util.CircleView;
 
 import java.util.ArrayList;
@@ -74,15 +78,32 @@ public class ServerListFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Toast.makeText(getContext(), "Reached onActivityResult", Toast.LENGTH_SHORT).show();
         super.onActivityResult(requestCode, resultCode, data);
         switch(requestCode) {
             case ServerListActivity.NEW_SERVER_REQUEST:
                 if(resultCode == Activity.RESULT_OK) {
+                    Toast.makeText(getContext(), "Reached NEW_SERVER_REQUEST", Toast.LENGTH_SHORT).show();
                     ServerConnection connection = data.getParcelableExtra("connection");
                     addServerConnection(connection);
                 }
                 break;
+            case ServerListActivity.EDIT_SERVER_REQUEST:
+                if(resultCode == Activity.RESULT_OK) {
+                    ServerConnection connection = data.getParcelableExtra("connection");
+                    Toast.makeText(getContext(), connection.toString(), Toast.LENGTH_SHORT).show();
+                    for(int i = 0; i < servers.size(); i++) {
+                        if(servers.get(i).getId() == connection.getId()) {
+                            servers.remove(i);
+                            servers.add(i, connection);
+                            serverAdapter.notifyDataSetChanged();
+                            break;
+                        }
+                    }
+                }
+                break;
             default:
+                Toast.makeText(getContext(),"Invalid Request Returned", Toast.LENGTH_SHORT).show();
                 break;
         }
     }
@@ -132,6 +153,31 @@ public class ServerListFragment extends Fragment {
                 Intent intent = new Intent(getActivity(), TerminalActivity.class);
                 intent.putExtra("connection", connection);
                 getActivity().startActivity(intent);
+            });
+
+            root.setOnLongClickListener(v -> {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Select an Action")
+                        .setPositiveButton("Edit", (dialog, which) -> {
+                            Intent intent = new Intent(getActivity(), ServerAddActivity.class);
+                            intent.putExtra("connection", connection);
+                            getActivity().startActivityForResult(intent, ServerListActivity.EDIT_SERVER_REQUEST);
+                        })
+                        .setNegativeButton("Delete", (dialog, which) -> {
+                            List<ServerConnection> newServers = new ArrayList<>();
+                            for(ServerConnection c : servers) {
+                                if(c.getId() != connection.getId()) {
+                                    newServers.add(c);
+                                }
+                            }
+                            servers = newServers;
+                            serverAdapter.notifyDataSetChanged();
+                        })
+                        .setNeutralButton("Cancel", (dialog, which) -> {
+                            // Do nothing
+                        });
+                builder.create().show();
+                return true;
             });
         }
 
@@ -207,7 +253,6 @@ public class ServerListFragment extends Fragment {
                     }));
 
                     connection.runBatchCommands(POLL_RATE);
-
                     break;
                 case Warn:
                     serverExceptionTextView.setVisibility(View.VISIBLE);

@@ -13,6 +13,31 @@ public class SampleData {
                 new Identity("1621638", "Stella1414"))
         );
 
+        connections.add(new ServerConnection(
+                new ServerInfo("linux2-cs.johnabbott.qc.ca", "Linux2"),
+                new Identity("1621638", "Stella1414"))
+        );
+
+        connections.add(new ServerConnection(
+                new ServerInfo("linux2-cs.johnabbott.qc.ca", "Linux2"),
+                new Identity("1621638", "Stella1414"))
+        );
+
+        connections.add(new ServerConnection(
+                new ServerInfo("linux2-cs.johnabbott.qc.ca", "Linux2"),
+                new Identity("1621638", "Stella1414"))
+        );
+
+        connections.add(new ServerConnection(
+                new ServerInfo("linux2-cs.johnabbott.qc.ca", "Linux2"),
+                new Identity("1621638", "Stella1414"))
+        );
+
+        connections.add(new ServerConnection(
+                new ServerInfo("linux2-cs.johnabbott.qc.ca", "Linux2"),
+                new Identity("1621638", "Stella1414"))
+        );
+
         return connections;
     }
 
